@@ -1,0 +1,52 @@
+Frontend:
+  impl: DEPO3
+  clock_ratio: 8
+  num_expected_insts: 0
+  llc_capacity_per_core: 256KB
+  llc_num_mshr_per_core: 16
+  inst_window_depth: 128
+  traces: 
+    - cputraces/easy.cpu_copy_8KB
+  trace_cache_only: false
+  no_wait_trace_cache_only: false
+
+  Translation:
+    impl: NoTranslation 
+    max_addr: 17179869184
+
+MemorySystem:
+  impl: BHDRAMSystem
+  clock_ratio: 3
+
+  DRAM:
+    impl: DDR5-VRR
+    org:
+      preset: DDR5_16Gb_x8 
+      channel: 1
+      rank: 2
+    timing:
+      preset: DDR5_3200AN 
+    RFM:
+      BRC: 2
+    drampower_enable: true
+    voltage:
+      preset: Default
+    current:
+      preset: Default
+
+  BHDRAMController:
+    impl: BHDRAMController
+    BHScheduler:
+      impl: BHScheduler 
+    RefreshManager:
+      impl: AllBank
+    RowPolicy:
+      impl: CloseRowPolicy
+      cap: 0
+    plugins:
+      - ControllerPlugin:
+          impl: TraceRecorder
+          path: ./test.cmds1
+
+  AddrMapper:
+    impl: RoBaRaCoCh_with_rit

@@ -1,0 +1,11 @@
+.vscode/**
+.scala-build/**
+.metals/**
+.Xil/**
+*.riscv
+*.txt
+*.hex
+*.out
+*.o
+*.dump
+*.bin
