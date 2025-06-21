@@ -44,6 +44,62 @@ ifeq ($(SUB_PROJECT),vcu118)
 	FPGA_BRAND        ?= xilinx
 endif
 
+ifeq ($(SUB_PROJECT),vcu108rocket)
+	SBT_PROJECT       ?= fpga_platforms
+	MODEL             ?= VCU108FPGATestHarness
+	VLOG_MODEL        ?= VCU108FPGATestHarness
+	MODEL_PACKAGE     ?= chipyard.fpga.vcu108
+	CONFIG            ?= RocketVCU108Config
+	CONFIG_PACKAGE    ?= chipyard.fpga.vcu108
+	GENERATOR_PACKAGE ?= chipyard
+	TB                ?= none # unused
+	TOP               ?= ChipTop
+	BOARD             ?= vcu108
+	FPGA_BRAND        ?= xilinx
+endif
+
+ifeq ($(SUB_PROJECT),vcu108boom)
+	SBT_PROJECT       ?= fpga_platforms
+	MODEL             ?= VCU108FPGATestHarness
+	VLOG_MODEL        ?= VCU108FPGATestHarness
+	MODEL_PACKAGE     ?= chipyard.fpga.vcu108
+	CONFIG            ?= BoomVCU108Config
+	CONFIG_PACKAGE    ?= chipyard.fpga.vcu108
+	GENERATOR_PACKAGE ?= chipyard
+	TB                ?= none # unused
+	TOP               ?= ChipTop
+	BOARD             ?= vcu108
+	FPGA_BRAND        ?= xilinx
+endif
+
+ifeq ($(SUB_PROJECT),vcu108easyrocket)
+	SBT_PROJECT       ?= fpga_platforms
+	MODEL             ?= VCU108FPGATestHarness
+	VLOG_MODEL        ?= VCU108FPGATestHarness
+	MODEL_PACKAGE     ?= chipyard.fpga.vcu108
+	CONFIG            ?= EasyRocketVCU108Config
+	CONFIG_PACKAGE    ?= chipyard.fpga.vcu108
+	GENERATOR_PACKAGE ?= chipyard
+	TB                ?= none # unused
+	TOP               ?= ChipTop
+	BOARD             ?= vcu108
+	FPGA_BRAND        ?= xilinx
+endif
+
+ifeq ($(SUB_PROJECT),vcu108easyboom)
+	SBT_PROJECT       ?= fpga_platforms
+	MODEL             ?= VCU108FPGATestHarness
+	VLOG_MODEL        ?= VCU108FPGATestHarness
+	MODEL_PACKAGE     ?= chipyard.fpga.vcu108
+	CONFIG            ?= EasyBoomVCU108Config
+	CONFIG_PACKAGE    ?= chipyard.fpga.vcu108
+	GENERATOR_PACKAGE ?= chipyard
+	TB                ?= none # unused
+	TOP               ?= ChipTop
+	BOARD             ?= vcu108
+	FPGA_BRAND        ?= xilinx
+endif
+
 ifeq ($(SUB_PROJECT),nexysvideo)
 	SBT_PROJECT       ?= chipyard_fpga
 	MODEL             ?= NexysVideoHarness
@@ -72,6 +128,7 @@ ifeq ($(SUB_PROJECT),arty35t)
 	BOARD             ?= arty
 	FPGA_BRAND        ?= xilinx
 endif
+
 ifeq ($(SUB_PROJECT),arty100t)
 	# TODO: Fix with Arty
 	SBT_PROJECT       ?= chipyard_fpga
