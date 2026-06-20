@@ -5,7 +5,7 @@ CXX = riscv64-unknown-elf-gcc
 CDUMP = riscv64-unknown-elf-objdump
 
 # compiler flags
-CXXFLAGS = -O2 -fno-common -fno-builtin-fprintf -fno-builtin-printf -specs=htif_nano.specs -I. -I../../../utilities/common -I../../../utilities
+CXXFLAGS = -O2 -fno-common -fno-builtin -specs=htif_nano.specs -I. -I../../../utilities/common -I../../../utilities
 
 # target executable
 TARGET = lu

@@ -61,7 +61,7 @@ CXX = riscv64-unknown-elf-gcc
 CDUMP = riscv64-unknown-elf-objdump
 
 # compiler flags
-CXXFLAGS = -O2 -fno-common -fno-builtin-fprintf -fno-builtin-printf -specs=htif_nano.specs -I. -I$utilityDir/common -I$utilityDir
+CXXFLAGS = -O2 -fno-common -fno-builtin -specs=htif_nano.specs -I. -I$utilityDir/common -I$utilityDir
 
 # target executable
 TARGET = $kernel

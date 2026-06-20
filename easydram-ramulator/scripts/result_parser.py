@@ -80,7 +80,7 @@ def parse(result_filename, error_filename):
                 return per_core_data, global_data
     with open(result_filename, "r", encoding="utf-8") as f:
         for line in f:
-            if "CommandCounter" in line:
+            if "CommandCounter" in line or "DummyMitigation" in line:
                 status = "DONE"
             process_line(line, per_core_data, global_data)
     global_data["prog_stat"] = status
