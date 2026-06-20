@@ -4,7 +4,7 @@
 set -e
 set -o pipefail
 
-CYDIR=$(git rev-parse --show-toplevel)
+CYDIR=$(dirname "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")")
 
 # get helpful utilities
 source $CYDIR/scripts/utils.sh

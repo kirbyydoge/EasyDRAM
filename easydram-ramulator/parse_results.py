@@ -3,7 +3,7 @@ import pandas as pd
 
 from easy_trace_cfg import *
 
-STAT_PATH = "/home/kirbyydoge/github/easydram-ramulator/ae_results/rowclone/Dummy/stats"
+STAT_PATH = os.path.join(BASE_DIR, "ae_results", "rowclone", "Dummy", "stats")
 LBL_CPU = "RAMCPU"
 LBL_RC = "RAMRC"
 
@@ -39,4 +39,4 @@ for test_size in test_case_kbs:
     df_index += 1
 
 df = df[:df_index]
-df.to_csv("dump.csv", index=False)
+df.to_csv(os.path.join(BASE_DIR, "dump.csv"), index=False)

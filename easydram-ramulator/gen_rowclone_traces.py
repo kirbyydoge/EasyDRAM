@@ -1,4 +1,8 @@
+import os
+
 from easy_trace_cfg import *
+
+os.makedirs(DUMP_FOLDER, exist_ok=True)
 
 # Generate CPU Copy
 for data_bytes in TEST_CASE_SIZES:

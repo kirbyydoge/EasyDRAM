@@ -1,3 +1,7 @@
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 LLC_BYTES_PER_CORE = 2 * 1024 * 1024 # 2 MiB
 NUM_CORES = 4
 LLC_ASSOC = 16
@@ -18,7 +22,7 @@ TEST_CASE_SIZES = [(2**i) * 1024 for i in range(3, 15)]
 CPU_REGISTER_BYTES = 8
 SUBARRAY_SIZE = 256
 
-DUMP_FOLDER = "./cputraces"
+DUMP_FOLDER = os.path.join(BASE_DIR, "cputraces")
 
 def make_tracename(is_cpu, is_copy, data_size):
     op_type = "cpu" if is_cpu else "rc"
