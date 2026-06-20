@@ -4,6 +4,9 @@
 .Xil/**
 *.riscv
 *.txt
+!easydram-ramulator/CMakeLists.txt
+!easydram-ramulator/src/**/CMakeLists.txt
+!easydram-ramulator/requirements.txt
 *.hex
 *.out
 *.o
