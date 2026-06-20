@@ -10,12 +10,16 @@ MC="${2%/}"
 PROG_LIST="${3}"
 CONFIG=$4
 
-CHIPYARD_BASE=/home/kirbyydoge/GitHub/chipyard
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
+PROGRAMS_DIR="${REPO_ROOT}/easydram-programs"
+
+CHIPYARD_BASE="${CHIPYARD_BASE:-${REPO_ROOT}/easydram-chipyard}"
 SRC_BASE="${CHIPYARD_BASE}/fpga/generated-src"
-BOARD="vcu108"
-HARNESS="VCU108FPGATestHarness"
+BOARD="${BOARD:-vcu108}"
+HARNESS="${HARNESS:-VCU108FPGATestHarness}"
 BIT_PATH="${SRC_BASE}/chipyard.fpga.${BOARD}.${HARNESS}.${CONFIG}/obj/${HARNESS}.bit"
-BENCHMARK_PATH="/home/kirbyydoge/GitHub/easyard/install/riscv-bmarks"
+BENCHMARK_PATH="${BENCHMARK_PATH:-${PROGRAMS_DIR}/install/riscv-bmarks}"
 
 sudo rm results.txt -y
 

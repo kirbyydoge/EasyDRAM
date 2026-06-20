@@ -73,7 +73,7 @@ ifeq ($(SUB_PROJECT),vcu108boom)
 endif
 
 ifeq ($(SUB_PROJECT),vcu108easyrocket)
-	SBT_PROJECT       ?= fpga_platforms
+	SBT_PROJECT       ?= chipyard_fpga
 	MODEL             ?= VCU108FPGATestHarness
 	VLOG_MODEL        ?= VCU108FPGATestHarness
 	MODEL_PACKAGE     ?= chipyard.fpga.vcu108

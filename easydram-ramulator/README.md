@@ -1,20 +1,23 @@
-## Repository File Structure 
+## Repository File Structure
 
 ```
 .
-+-- ae_results/                     # Simulation results and plots (will be overwritten when new experiments are executed)
-+-- cputraces/                      # CPU traces for 56 single-core workloads
++-- ae_results/                     # Simulation results (created when experiments are executed)
++-- cputraces/                      # Generated EasyDRAM RowClone CPU traces
 +-- mixes/                          # Workload mixes
-|   +-- hpcasingle.mix/             # 58 single-core workloads
-|   +-- hpcabenign.mix/             # 60 multi-core workloads
-+-- plotting_scripts/               # Scripts to use extracted simulation statistics and create the plots in our paper
-+-- scripts/                        # Scripts to post-process raw data and extract statistics for plotting
+|   +-- rowclone.mix                # EasyDRAM RowClone workloads
++-- scripts/                        # Scripts to generate runs and post-process raw data
 +-- src/                            # Ramulator2 source code
-|   +-- dram_controller/
-|   |   +--impl/plugin
-|   |   |  +-- chronus.cpp          # Ramulator2 plugin that implements Chronus
+|   +-- dram/impl/DDR5-VRR.cpp      # DDR5 model extended with EasyDRAM RowClone commands
+|   +-- frontend/impl/processor/depO3/
+|   |   +-- depcore.cpp             # Dependent-O3 frontend with EasyDRAM RowClone trace support
 |   ...
 ...
++-- base_config.yaml                # Base Ramulator2 configuration for the simple test
++-- gen_rowclone_traces.py          # Generates EasyDRAM RowClone traces
++-- parse_results.py                # Extracts EasyDRAM RowClone statistics into dump.csv
++-- run_simple_test.sh              # Builds Ramulator2 and runs a simple RowClone test
++-- run_with_personalcomputer.sh    # Generates and runs the EasyDRAM RowClone experiment batch locally
 +-- README.md                       # This file
 ```
 
@@ -24,37 +27,32 @@
 - Git
 - g++ with c++20 capabilities (g++-10 or above recommended)
 - Python3 (3.10 or above recommended)
-- Podman (Optional)
-  - We have tested Podman 4.5.1 on Ubuntu 22.04.1
- 
-### Installation steps:
-1. Clone the repository `git clone https://github.com/CMU-SAFARI/Chronus.git`
-2. Install python dependencies, build Ramulator2, and download traces with `./run_simple_test.sh`[^1]
 
-[^1]: To start (or stop) using Podman, the repository should be rebuilt using `./run_simple_test.sh` with (or without) `podman run`
+### Installation steps:
+1. Clone the repository `git clone https://github.com/CMU-SAFARI/EasyDRAM.git`
+2. Go to the Ramulator directory with `cd EasyDRAM/easydram-ramulator`
+3. Install python dependencies, build Ramulator2, generate EasyDRAM RowClone traces, and run a simple test with `./run_simple_test.sh`
 
 ## Example Use
-1. Run Ramulator2 simulations `./run_with_slurm.sh` or `./run_with_slurm_podman.sh`[^2]. If you do not have Slurm use `./run_with_personalcomputer.sh` instead
+1. Run Ramulator2 simulations with `./run_with_personalcomputer.sh`
 2. Wait for the simulations to finish. You can use `./check_run_status.sh` to track simulation progress for multicore and singlecore runs (this script also creates intermediate scripts that can restart failed runs)
-3. Parse simulation results and collects statistics with `./parse_results.sh`
-4. Generate figures with `./plot_all_figures.sh`
-
-[^2]: `./run_with_slurm_podman.sh` can be executed *without* using Podman since the script launches Slurm jobs that *use* Podman.
+3. Parse simulation results and collect EasyDRAM RowClone statistics with `python3 ./parse_results.py`
+4. The parsed results are written to `dump.csv`
 
 ## Simulation Configuration Parameters
 Execution of Ramulator2 simulations can be configured with the following configuration parameters. These parameters reside in `scripts/run_config.py` unless the parameter description below states a different path.
 
 `PERSONAL_RUN_THREADS`: Number of parallel threads used to launch simulations with `./run_with_personalcomputer.sh`
 
-`SLURM_USERNAME`: Slurm username. Defaults to `$USER`
+`NUM_EXPECTED_INSTS`: Number of instructions the slowest core must execute before the simulation ends
 
-`MAX_SLURM_JOBS`: Maximum number of Slurm jobs submitted by the user allowed at any time
+`NUM_MAX_CYCLES`: Maximum number of cycles the simulation is allowed to run
 
-`SLURM_SUBMIT_DELAY`: Delay between submitting Slurm jobs (until job limit is reached)
+`CONTROLLER`: Ramulator2 memory controller implementation used by generated configurations
 
-`SLURM_RETRY_DELAY`: Delay between retrying to submit Slurm jobs (when job limit is reached)
+`SCHEDULER`: Ramulator2 scheduler implementation used by generated configurations
 
-`AE_SLURM_PART_NAME`: Job partition of the submitted Slurm jobs. This parameter is configurable in `./run_with_slurm.sh` or `./run_with_slurm_podman.sh` scripts
+Trace generation parameters, including the tested data sizes, reside in `easy_trace_cfg.py`.
 
 ## Contacts:
-Oğuzhan Canpolat (aqwoguz [at] gmail [dot] com)  
+Oğuzhan Canpolat (aqwoguz [at] gmail [dot] com)

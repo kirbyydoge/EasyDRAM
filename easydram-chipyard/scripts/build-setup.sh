@@ -26,8 +26,8 @@ usage() {
     echo "   5. Chipyard pre-compile sources"
     echo "   6. FireSim"
     echo "   7. FireSim pre-compile sources"
-    echo "   8. FireMarshal"
-    echo "   9. FireMarshal pre-compile default buildroot Linux sources"
+    echo "   8. FireMarshal (skipped by default)"
+    echo "   9. FireMarshal pre-compile default buildroot Linux sources (skipped by default)"
     echo "  10. Install CIRCT"
     echo "  11. Runs repository clean-up"
     echo ""
@@ -38,6 +38,7 @@ usage() {
     echo "  --verbose -v            : Verbose printout"
     echo "  --use-unpinned-deps -ud : Use unpinned conda environment"
     echo "  --use-lean-conda        : Install a leaner version of the repository (Smaller conda env, no FireSim, no FireMarshal)"
+    echo "  --with-marshal          : Enable FireMarshal initialization and precompile steps"
     echo "  --build-circt           : Builds CIRCT from source, instead of downloading the precompiled binary"
 
     echo "  --skip -s N             : Skip step N in the list above. Use multiple times to skip multiple steps ('-s N -s M ...')."
@@ -61,6 +62,7 @@ USE_UNPINNED_DEPS=false
 USE_LEAN_CONDA=false
 SKIP_LIST=()
 BUILD_CIRCT=false
+WITH_MARSHAL=false
 
 # getopts does not support long options, and is inflexible
 while [ "$1" != "" ];
@@ -75,7 +77,9 @@ do
             set -x ;;
         --use-lean-conda)
             USE_LEAN_CONDA=true
-            SKIP_LIST+=(4 6 7 8 9) ;;
+            SKIP_LIST+=(4 6 7) ;;
+        --with-marshal)
+            WITH_MARSHAL=true ;;
         --build-circt)
             BUILD_CIRCT=true ;;
         -ud | --use-unpinned-deps )
@@ -109,6 +113,10 @@ do
     esac
     shift
 done
+
+if [ "$WITH_MARSHAL" = false ]; then
+    SKIP_LIST+=(8 9)
+fi
 
 # return true if the arg is not found in the SKIP_LIST
 run_step() {

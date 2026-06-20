@@ -11,10 +11,14 @@ MC="rc_mc"
 PROG="rc_bulk_wp"
 CONFIG="EasyBoomVCU108Config"
 
-CHIPYARD_BASE=/home/kirbyydoge/GitHub/chipyard
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
+PROGRAMS_DIR="${REPO_ROOT}/easydram-programs"
+
+CHIPYARD_BASE="${CHIPYARD_BASE:-${REPO_ROOT}/easydram-chipyard}"
 SRC_BASE="${CHIPYARD_BASE}/fpga/generated-src"
-BOARD="vcu108"
-HARNESS="VCU108FPGATestHarness"
+BOARD="${BOARD:-vcu108}"
+HARNESS="${HARNESS:-VCU108FPGATestHarness}"
 BIT_PATH="${SRC_BASE}/chipyard.fpga.${BOARD}.${HARNESS}.${CONFIG}/obj/${HARNESS}.bit"
 
 set -e

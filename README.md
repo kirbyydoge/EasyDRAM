@@ -13,7 +13,7 @@ EasyDRAM is an open-source infrastructure that enables fast and accurate end-to-
 - **`easydram-ramulator/`**  
   Contains our Ramulator-based evaluation infrastructure for DRAM techniques.  
   This version includes our evaluation of **RowClone** within Ramulator 2.0.  
-  _Our PolyBench traces and SolarDRAM implementation will be released soon._
+  The included scripts generate EasyDRAM RowClone traces, run Ramulator2 simulations, and parse the resulting statistics.
 
 - **`easydram-programs/`**  
   A collection of benchmarks and programs used for testing and evaluating EasyDRAM.  

@@ -107,7 +107,6 @@ dependencies:
     - boto3-stubs
     - mypy-boto3-s3
     - mypy_boto3_ec2
-    - botocore-stubs
     - cryptography<41
     - pytz
     - types-pytz

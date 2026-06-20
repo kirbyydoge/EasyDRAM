@@ -1,4 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "$0")"
+
+DEFAULT_BENCHMARK_DIR="$(cd ../../.. && pwd)/install/riscv-bmarks"
+echo "Writing benchmarks to: ${BENCHMARK_DIR:-${DEFAULT_BENCHMARK_DIR}}"
 
 for dir in $(find . -type d); do
     if [[ -f "${dir}/Makefile" ]]; then
@@ -7,7 +13,7 @@ for dir in $(find . -type d); do
     fi
 done
 
-echo "Logging Becnhmarks:"
+echo "Logging Benchmarks:"
 
 for dir in $(find . -type d); do
     if [[ -f "${dir}/Makefile" ]]; then

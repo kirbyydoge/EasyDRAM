@@ -5,7 +5,7 @@
 set -e
 set -o pipefail
 
-RDIR=$(git rev-parse --show-toplevel)
+RDIR=$(dirname "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")")
 
 cd "$RDIR"
 

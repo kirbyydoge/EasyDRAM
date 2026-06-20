@@ -1,4 +1,4 @@
-BENCHMARK_DIR=/home/kirbyydoge/github/easyprogs/install/riscv-bmarks
+BENCHMARK_DIR ?= $(abspath $(COMMON_DIR)/../../../install/riscv-bmarks)
 
 # compiler to use
 CXX = riscv64-unknown-elf-gcc
@@ -23,6 +23,7 @@ OBJS = syr2k.o
 syr2k: $(OBJS) $(COMMON_OBJS)
 	$(CXX) $(CXXFLAGS) -o syr2k.riscv $^ -lm
 	$(CDUMP) -d syr2k.riscv > syr2k.riscv.dump
+	mkdir -p $(BENCHMARK_DIR)
 	cp syr2k.riscv $(BENCHMARK_DIR)
 	cp syr2k.riscv.dump $(BENCHMARK_DIR)
 
@@ -30,6 +31,7 @@ $(OBJS): $(SRCS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@ -lm
 
 $(COMMON_OBJS): $(OBJ_DIR)/%.o : $(COMMON_DIR)/%.c
+	mkdir -p $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@ -lm
 
 default: syr2k

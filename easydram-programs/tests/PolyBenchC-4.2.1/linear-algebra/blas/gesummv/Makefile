@@ -1,4 +1,4 @@
-BENCHMARK_DIR=/home/kirbyydoge/github/easyprogs/install/riscv-bmarks
+BENCHMARK_DIR ?= $(abspath $(COMMON_DIR)/../../../install/riscv-bmarks)
 
 # compiler to use
 CXX = riscv64-unknown-elf-gcc
@@ -23,6 +23,7 @@ OBJS = gesummv.o
 gesummv: $(OBJS) $(COMMON_OBJS)
 	$(CXX) $(CXXFLAGS) -o gesummv.riscv $^ -lm
 	$(CDUMP) -d gesummv.riscv > gesummv.riscv.dump
+	mkdir -p $(BENCHMARK_DIR)
 	cp gesummv.riscv $(BENCHMARK_DIR)
 	cp gesummv.riscv.dump $(BENCHMARK_DIR)
 
@@ -30,6 +31,7 @@ $(OBJS): $(SRCS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@ -lm
 
 $(COMMON_OBJS): $(OBJ_DIR)/%.o : $(COMMON_DIR)/%.c
+	mkdir -p $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@ -lm
 
 default: gesummv
