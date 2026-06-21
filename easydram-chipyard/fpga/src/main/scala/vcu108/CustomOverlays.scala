@@ -3,6 +3,7 @@ package chipyard.fpga.vcu108
 import chisel3._
 import org.chipsalliance.cde.config.{Parameters, Field}
 import freechips.rocketchip.diplomacy._
+import freechips.rocketchip.prci._
 import freechips.rocketchip.tilelink.TLAsyncCrossingSink
 import sifive.fpgashells.clocks._
 import sifive.fpgashells.devices.xilinx.xilinxvcu118mig.{XilinxVCU118MIG, XilinxVCU118MIGPads, XilinxVCU118MIGParams}
@@ -10,7 +11,7 @@ import sifive.fpgashells.shell._
 import sifive.fpgashells.shell.xilinx._
 import freechips.rocketchip.util.{ElaborationArtefacts}
 
-class SysClock2VCU108PlacedOverlay(val shell: VCU108ShellBasicOverlays, name: String, val designInput: ClockInputDesignInput, val shellInput: ClockInputShellInput)
+class SysClock2VCU108PlacedOverlay(val shell: VCU118ShellBasicOverlays, name: String, val designInput: ClockInputDesignInput, val shellInput: ClockInputShellInput)
   extends LVDSClockInputXilinxPlacedOverlay(name, designInput, shellInput)
 {
   val node = shell { ClockSourceNode(freqMHz = 300, jitterPS = 50)(ValName(name)) }
@@ -22,13 +23,14 @@ class SysClock2VCU108PlacedOverlay(val shell: VCU108ShellBasicOverlays, name: St
     shell.xdc.addIOStandard(io.n, "DIFF_SSTL12")
   } }
 }
-class SysClock2VCU108ShellPlacer(shell: VCU108ShellBasicOverlays, val shellInput: ClockInputShellInput)(implicit val valName: ValName)
-  extends ClockInputShellPlacer[VCU108ShellBasicOverlays]
+class SysClock2VCU108ShellPlacer(shell: VCU118ShellBasicOverlays, val shellInput: ClockInputShellInput)(implicit val valName: ValName)
+  extends ClockInputShellPlacer[VCU118ShellBasicOverlays]
 {
     def place(designInput: ClockInputDesignInput) = new SysClock2VCU108PlacedOverlay(shell, valName.name, designInput, shellInput)
 }
 
-case object VCU108DDR2Size extends Field[BigInt](0x40000000L * 2) // 2GB
+case object VCU108DDRSize extends Field[BigInt](0x40000000L * 2) // 2GB
+case object VCU108ShellPMOD extends Field[String]("JTAG")
 class DDR2VCU108PlacedOverlay(val shell: VCU108FPGATestHarness, name: String, val designInput: DDRDesignInput, val shellInput: DDRShellInput)
   extends DDRPlacedOverlay[XilinxVCU118MIGPads](name, designInput, shellInput)
 {
@@ -77,7 +79,7 @@ class DDR2VCU108PlacedOverlay(val shell: VCU108FPGATestHarness, name: String, va
     ui.reset := /*!port.mmcm_locked ||*/ port.c0_ddr4_ui_clk_sync_rst
     port.c0_sys_clk_i := sys.clock.asUInt
     port.sys_rst := sys.reset // pllReset
-    port.c0_ddr4_aresetn := !ar.reset
+    port.c0_ddr4_aresetn := !(ar.reset.asBool)
 
     // This was just copied from the SiFive example, but it's hard to follow.
     // The pins are emitted in the following order:
@@ -105,4 +107,3 @@ class DDR2VCU108ShellPlacer(shell: VCU108FPGATestHarness, val shellInput: DDRShe
   extends DDRShellPlacer[VCU108FPGATestHarness] {
   def place(designInput: DDRDesignInput) = new DDR2VCU108PlacedOverlay(shell, valName.name, designInput, shellInput)
 }
-

@@ -24,7 +24,7 @@ PROGRAM_LIST = [
     "jacobi-1d", "jacobi-2d", "fdtd-2d",
 ]
 
-CYCLE_RE = re.compile(r"\bcycles:(\d+)\b")
+CYCLE_RE = re.compile(r"\bcycles?:(\d+)\b")
 
 
 def parse_args():

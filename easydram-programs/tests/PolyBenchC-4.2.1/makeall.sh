@@ -3,7 +3,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-DEFAULT_BENCHMARK_DIR="$(cd ../../.. && pwd)/install/riscv-bmarks"
+DEFAULT_BENCHMARK_DIR="$(cd ../.. && pwd)/install/riscv-bmarks"
 echo "Writing benchmarks to: ${BENCHMARK_DIR:-${DEFAULT_BENCHMARK_DIR}}"
 
 for dir in $(find . -type d); do

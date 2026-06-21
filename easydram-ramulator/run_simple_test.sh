@@ -1,4 +1,5 @@
 #! /bin/bash
+set -e
 
 echo "[INFO] Installing Python dependencies"
 python3 -m pip install -r requirements.txt

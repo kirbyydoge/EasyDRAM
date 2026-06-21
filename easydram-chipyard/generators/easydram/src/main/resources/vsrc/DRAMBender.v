@@ -41,9 +41,19 @@ module DRAMBender #(
   output                        db_last_o,
   input                         db_ready_i,
 
-  output                        bender_done_o
+  output                        bender_done_o,
+
+  // Newer Chipyard emits these sim-only blackbox ports.
+  input  [63:0]                 bypass_addr_i,
+  input  [511:0]                bypass_wr_data_i,
+  input                         bypass_wr_en_i,
+  output [511:0]                bypass_rd_data_o,
+  output                        bypass_rd_valid_o
 );
   
+  assign bypass_rd_data_o = 512'b0;
+  assign bypass_rd_valid_o = 1'b0;
+
   assign c0_ddr4_odt[1] = 1'b0;
   assign c0_ddr4_cs_n[1] = 1'b1;
   assign c0_ddr4_cke[1] = 1'b0;

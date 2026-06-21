@@ -7,6 +7,11 @@ import freechips.rocketchip.util.{ElaborationArtefacts}
 import easydram.bramblackbox._
 import easydram.obufdsblackbox._
 
+private object DRAMBenderResources {
+    def vsrcPath(file: String): String =
+        new java.io.File(s"generators/easydram/src/main/resources/vsrc/$file").getAbsolutePath
+}
+
 case class DRAMBenderParams(
     addrWidth: Int = 17,
     bankWidth: Int = 2,
@@ -283,7 +288,6 @@ trait WithVCU108PhyDDR4IP {
         CONFIG.DIFF_TERM_SYSCLK                            {false} \
         CONFIG.Debug_Signal                                {Disable} \
         CONFIG.Default_Bank_Selections                     {false} \
-        CONFIG.EN_PP_4R_MIR                                {false} \
         CONFIG.Enable_SysPorts                             {true} \
         CONFIG.Example_TG                                  {SIMPLE_TG} \
         CONFIG.IOPowerReduction                            {OFF} \
@@ -609,8 +613,8 @@ trait WithVCU108ScratchpadIP {
 trait WithVCU108PrReadMemIP {
     ElaborationArtefacts.add(
         "vcu108prrdmem.vivado.tcl",
-    """
-    create_ip -vendor xilinx.com -library ip -name blk_mem_gen -version 8.4 -module_name pr_read_mem -dir $ipdir -force
+    raw"""
+    create_ip -vendor xilinx.com -library ip -name blk_mem_gen -version 8.4 -module_name pr_read_mem -dir $$ipdir -force
     set_property -dict [list \
         CONFIG.AXILITE_SLAVE_S_AXI.INSERT_VIP              {0} \
         CONFIG.AXI_ID_Width                                {4} \
@@ -623,7 +627,7 @@ trait WithVCU108PrReadMemIP {
         CONFIG.Byte_Size                                   {9} \
         CONFIG.CLK.ACLK.INSERT_VIP                         {0} \
         CONFIG.CTRL_ECC_ALGO                               {NONE} \
-        CONFIG.Coe_File                                    {/home/kirbyydoge/GitHub/chipyard/generators/easydram/src/main/resources/vsrc/pr_read.coe} \
+        CONFIG.Coe_File                                    {${DRAMBenderResources.vsrcPath("pr_read.coe")}} \
         CONFIG.Collision_Warnings                          {ALL} \
         CONFIG.Disable_Collision_Warnings                  {false} \
         CONFIG.Disable_Out_of_Range_Warnings               {false} \
@@ -694,8 +698,8 @@ trait WithVCU108PrReadMemIP {
 trait WithVCU108ZqCalibMemIP {
     ElaborationArtefacts.add(
         "vcu108zqcalibmem.vivado.tcl",
-    """
-    create_ip -vendor xilinx.com -library ip -name blk_mem_gen -version 8.4 -module_name zq_calib_mem -dir $ipdir -force
+    raw"""
+    create_ip -vendor xilinx.com -library ip -name blk_mem_gen -version 8.4 -module_name zq_calib_mem -dir $$ipdir -force
     set_property -dict [list \
         CONFIG.AXILITE_SLAVE_S_AXI.INSERT_VIP              {0} \
         CONFIG.AXI_ID_Width                                {4} \
@@ -708,7 +712,7 @@ trait WithVCU108ZqCalibMemIP {
         CONFIG.Byte_Size                                   {9} \
         CONFIG.CLK.ACLK.INSERT_VIP                         {0} \
         CONFIG.CTRL_ECC_ALGO                               {NONE} \
-        CONFIG.Coe_File                                    {/home/kirbyydoge/GitHub/chipyard/generators/easydram/src/main/resources/vsrc/pr_zq.coe} \
+        CONFIG.Coe_File                                    {${DRAMBenderResources.vsrcPath("pr_zq.coe")}} \
         CONFIG.Collision_Warnings                          {ALL} \
         CONFIG.Disable_Collision_Warnings                  {false} \
         CONFIG.Disable_Out_of_Range_Warnings               {false} \
@@ -779,8 +783,8 @@ trait WithVCU108ZqCalibMemIP {
 trait WithVCU108PrRefMemIP {
     ElaborationArtefacts.add(
         "vcu108prrefmem.vivado.tcl",
-    """
-    create_ip -vendor xilinx.com -library ip -name blk_mem_gen -version 8.4 -module_name pr_ref_mem -dir $ipdir -force
+    raw"""
+    create_ip -vendor xilinx.com -library ip -name blk_mem_gen -version 8.4 -module_name pr_ref_mem -dir $$ipdir -force
     set_property -dict [list \
         CONFIG.AXILITE_SLAVE_S_AXI.INSERT_VIP              {0} \
         CONFIG.AXI_ID_Width                                {4} \
@@ -793,7 +797,7 @@ trait WithVCU108PrRefMemIP {
         CONFIG.Byte_Size                                   {9} \
         CONFIG.CLK.ACLK.INSERT_VIP                         {0} \
         CONFIG.CTRL_ECC_ALGO                               {NONE} \
-        CONFIG.Coe_File                                    {/home/kirbyydoge/GitHub/chipyard/generators/easydram/src/main/resources/vsrc/pr_ref.coe} \
+        CONFIG.Coe_File                                    {${DRAMBenderResources.vsrcPath("pr_ref.coe")}} \
         CONFIG.Collision_Warnings                          {ALL} \
         CONFIG.Disable_Collision_Warnings                  {false} \
         CONFIG.Disable_Out_of_Range_Warnings               {false} \

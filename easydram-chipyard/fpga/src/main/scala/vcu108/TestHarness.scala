@@ -4,9 +4,10 @@ import chipyard.harness.ApplyHarnessBinders
 import chipyard.iobinders.HasIOBinders
 import chipyard._
 import chisel3._
-import org.chipsalliance.cde.config.{Parameters}
+import org.chipsalliance.cde.config.Parameters
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.tilelink._
+import freechips.rocketchip.prci._
 import freechips.rocketchip.util._
 import sifive.blocks.devices.spi._
 import sifive.blocks.devices.uart._
@@ -17,23 +18,26 @@ import sifive.fpgashells.shell.xilinx._
 import chipyard.harness.{HasHarnessInstantiators}
 import freechips.rocketchip.subsystem.{SystemBusKey}
 
-class VCU108FPGATestHarness(override implicit val p: Parameters) extends VCU108ShellBasicOverlays {
+class VCU108FPGATestHarness(override implicit val p: Parameters) extends VCU118ShellBasicOverlays {
 
 def dp = designParameters
 
   val pmod_is_sdio  = p(VCU108ShellPMOD) == "SDIO"
   val jtag_location = Some(if (pmod_is_sdio) "FMC_J2" else "PMOD_J52")
+  val hasUART = dp(PeripheryUARTKey).nonEmpty
+  val hasSPI = dp(PeripherySPIKey).nonEmpty
+  val hasExtMem = dp(ExtTLMem).nonEmpty
 
   // Order matters; ddr depends on sys_clock
-  val uart      = Overlay(UARTOverlayKey, new UARTVCU108ShellPlacer(this, UARTShellInput()))
-  val sdio      = if (pmod_is_sdio) Some(Overlay(SPIOverlayKey, new SDIOVCU108ShellPlacer(this, SPIShellInput()))) else None
-  val jtag      = Overlay(JTAGDebugOverlayKey, new JTAGDebugVCU108ShellPlacer(this, JTAGDebugShellInput(location = jtag_location)))
-  val cjtag     = Overlay(cJTAGDebugOverlayKey, new cJTAGDebugVCU108ShellPlacer(this, cJTAGDebugShellInput()))
-  val jtagBScan = Overlay(JTAGDebugBScanOverlayKey, new JTAGDebugBScanVCU108ShellPlacer(this, JTAGDebugBScanShellInput()))
+  val uart      = if (hasUART) Some(Overlay(UARTOverlayKey, new UARTVCU118ShellPlacer(this, UARTShellInput()))) else None
+  val sdio      = if (pmod_is_sdio && hasSPI) Some(Overlay(SPIOverlayKey, new SDIOVCU118ShellPlacer(this, SPIShellInput()))) else None
+  val jtag      = Overlay(JTAGDebugOverlayKey, new JTAGDebugVCU118ShellPlacer(this, JTAGDebugShellInput(location = jtag_location)))
+  val cjtag     = Overlay(cJTAGDebugOverlayKey, new cJTAGDebugVCU118ShellPlacer(this, cJTAGDebugShellInput()))
+  val jtagBScan = Overlay(JTAGDebugBScanOverlayKey, new JTAGDebugBScanVCU118ShellPlacer(this, JTAGDebugBScanShellInput()))
   //val fmc       = Overlay(PCIeOverlayKey, new PCIeVCU108FMCShellPlacer(this, PCIeShellInput()))
   //val edge      = Overlay(PCIeOverlayKey, new PCIeVCU108EdgeShellPlacer(this, PCIeShellInput()))
   val sys_clock2 = Overlay(ClockInputOverlayKey, new SysClock2VCU108ShellPlacer(this, ClockInputShellInput()))
-  val ddr2       = Overlay(DDROverlayKey, new DDR2VCU108ShellPlacer(this, DDRShellInput()))
+  val ddr2       = if (hasExtMem) Some(Overlay(DDROverlayKey, new DDR2VCU108ShellPlacer(this, DDRShellInput()))) else None
 
 // DOC include start: ClockOverlay
   // place all clocks in the shell
@@ -60,36 +64,56 @@ def dp = designParameters
 // DOC include start: UartOverlay
   // 1st UART goes to the VCU108 dedicated UART
 
-  val io_uart_bb = BundleBridgeSource(() => (new UARTPortIO(dp(PeripheryUARTKey).head)))
-  dp(UARTOverlayKey).head.place(UARTDesignInput(io_uart_bb))
+  val io_uart_bb = if (hasUART) {
+    val bridge = BundleBridgeSource(() => (new UARTPortIO(dp(PeripheryUARTKey).head)))
+    dp(UARTOverlayKey).head.place(UARTDesignInput(bridge))
+    Some(bridge)
+  } else {
+    None
+  }
 // DOC include end: UartOverlay
 
   /*** SPI ***/
 
   // 1st SPI goes to the VCU108 SDIO port
 
-  val io_spi_bb = BundleBridgeSource(() => (new SPIPortIO(dp(PeripherySPIKey).head)))
-  dp(SPIOverlayKey).head.place(SPIDesignInput(dp(PeripherySPIKey).head, io_spi_bb))
+  val io_spi_bb = if (hasSPI) {
+    val bridge = BundleBridgeSource(() => (new SPIPortIO(dp(PeripherySPIKey).head)))
+    dp(SPIOverlayKey).head.place(SPIDesignInput(dp(PeripherySPIKey).head, bridge))
+    Some(bridge)
+  } else {
+    None
+  }
 
   /*** DDR ***/
 
-  val ddrNode = dp(DDROverlayKey).head.place(DDRDesignInput(dp(ExtTLMem).get.master.base, dutWrangler.node, harnessSysPLL)).overlayOutput.ddr
+  val ddrNode = if (hasExtMem) {
+    Some(dp(DDROverlayKey).head.place(DDRDesignInput(dp(ExtTLMem).get.master.base, dutWrangler.node, harnessSysPLL)).overlayOutput.ddr)
+  } else {
+    None
+  }
 
   // connect 1 mem. channel to the FPGA DDR
-  val ddrClient = TLClientNode(Seq(TLMasterPortParameters.v1(Seq(TLMasterParameters.v1(
-    name = "chip_ddr",
-    sourceId = IdRange(0, 1 << dp(ExtTLMem).get.master.idBits)
-  )))))
-  ddrNode := TLWidthWidget(dp(ExtTLMem).get.master.beatBytes) := ddrClient
+  val ddrClient = if (hasExtMem) {
+    val client = TLClientNode(Seq(TLMasterPortParameters.v1(Seq(TLMasterParameters.v1(
+      name = "chip_ddr",
+      sourceId = IdRange(0, 1 << dp(ExtTLMem).get.master.idBits)
+    )))))
+    ddrNode.get := TLWidthWidget(dp(ExtTLMem).get.master.beatBytes) := client
+    Some(client)
+  } else {
+    None
+  }
   // module implementation
   override lazy val module = new VCU108FPGATestHarnessImp(this)
 }
 
 class VCU108FPGATestHarnessImp(_outer: VCU108FPGATestHarness) extends LazyRawModuleImp(_outer) with HasHarnessInstantiators {
+  override def provideImplicitClockToLazyChildren = true
 
   val vcu108Outer = _outer
 
-  val reset = IO(Input(Bool()))
+  val reset = IO(Input(Bool())).suggestName("reset")
   _outer.xdc.addPackagePin(reset, "E36")
   _outer.xdc.addIOStandard(reset, "LVCMOS12")
 
@@ -102,7 +126,7 @@ class VCU108FPGATestHarnessImp(_outer: VCU108FPGATestHarness) extends LazyRawMod
   _outer.sdc.addAsyncPath(Seq(powerOnReset))
 
   val ereset: Bool = _outer.chiplink.get() match {
-    case Some(x: ChipLinkVCU108PlacedOverlay) => !x.ereset_n
+    case Some(x: ChipLinkVCU118PlacedOverlay) => !x.ereset_n
     case _ => false.B
   }
 

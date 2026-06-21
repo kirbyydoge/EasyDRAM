@@ -53,10 +53,10 @@ class EasyDRAMTopIO(val p: DRAMBenderParams) extends Bundle {
   val c0_ddr4_ck_c                = Output(UInt(p.ckWidth.W))
   val c0_ddr4_reset_n             = Output(Bool())
 
-  // val c0_ddr4_dqs_c               = Analog(p.dqsWidth.W)
-  // val c0_ddr4_dqs_t               = Analog(p.dqsWidth.W)
-  // val c0_ddr4_dq                  = Analog(p.dqWidth.W)
-  // val c0_ddr4_dm_dbi_n            = Analog(p.dmWidth.W)
+  val c0_ddr4_dqs_c               = Analog(p.dqsWidth.W)
+  val c0_ddr4_dqs_t               = Analog(p.dqsWidth.W)
+  val c0_ddr4_dq                  = Analog(p.dqWidth.W)
+  val c0_ddr4_dm_dbi_n            = Analog(p.dmWidth.W)
   val c0_ddr4_parity              = Output(Bool())
 }
 
@@ -828,10 +828,10 @@ class EasyMemoryModuleImp(outer: EasyMemory) extends LazyModuleImp(outer) with H
   io.c0_ddr4_parity           := drambender.io.c0_ddr4_parity
 
   // DDR inouts
-  // attach(io.c0_ddr4_dqs_c, drambender.io.c0_ddr4_dqs_c)
-  // attach(io.c0_ddr4_dqs_t, drambender.io.c0_ddr4_dqs_t)
-  // attach(io.c0_ddr4_dq, drambender.io.c0_ddr4_dq)
-  // attach(io.c0_ddr4_dm_dbi_n, drambender.io.c0_ddr4_dm_dbi_n)
+  attach(io.c0_ddr4_dqs_c, drambender.io.c0_ddr4_dqs_c)
+  attach(io.c0_ddr4_dqs_t, drambender.io.c0_ddr4_dqs_t)
+  attach(io.c0_ddr4_dq, drambender.io.c0_ddr4_dq)
+  attach(io.c0_ddr4_dm_dbi_n, drambender.io.c0_ddr4_dm_dbi_n)
 
   drambender.io.batch_clk_i := clock
   drambender.io.batch_rstn_i := !benderProgram.instRst
@@ -1409,7 +1409,7 @@ trait CanHavePeripheryEasyMemory { this: BaseSubsystem =>
   private val sbus = locateTLBusWrapper(SBUS)
   private val mbus = locateTLBusWrapper(MBUS)
   private val cbus = locateTLBusWrapper(CBUS)
-  val easydram_io = p(EasyMemoryKey).map { params =>
+  val easydram_io = p(EasyMemoryKey).flatMap { params =>
       def verifTLUBundleParams: TLBundleParameters = TLBundleParameters(addressBits = 64, dataBits = 64, sourceBits = 1,
         sinkBits = 1, sizeBits = 6,  echoFields = Seq(), requestFields = Seq(), responseFields = Seq(), hasBCE = false)
       val easymem = mbus { LazyModule(new EasyMemory()(p)) }
@@ -1420,17 +1420,28 @@ trait CanHavePeripheryEasyMemory { this: BaseSubsystem =>
       cbus.coupleFrom("easy-gating") { _ := TLBuffer() := easymem.gateNode}
       easymem.dummyOut := visibilityNode
       visibilityNode := easymem.dummyIn
-      val easymem_io = mbus { InModuleBody {
-        val easydram_io = IO(new EasyDRAMTopIO(new DRAMBenderParams))
-        easydram_io <> easymem.module.io
-        easydram_io
-      } }
-      val easydram_io = InModuleBody {
-        val easydram_io = IO(new EasyDRAMTopIO(new DRAMBenderParams))
-        easydram_io <> easymem_io
-        easydram_io
+
+      if (params.simulation) {
+        mbus { InModuleBody {
+          easymem.module.io.c0_sys_clk_p := false.B.asClock
+          easymem.module.io.c0_sys_clk_n := false.B.asClock
+          easymem.module.io.sys_rst := false.B
+          easymem.module.io.btn_rst := false.B
+        } }
+        None
+      } else {
+        val easymem_io = mbus { InModuleBody {
+          val easydram_io = IO(new EasyDRAMTopIO(new DRAMBenderParams))
+          easydram_io <> easymem.module.io
+          easydram_io
+        } }
+        val easydram_io = InModuleBody {
+          val easydram_io = IO(new EasyDRAMTopIO(new DRAMBenderParams))
+          easydram_io <> easymem_io
+          easydram_io
+        }
+        Some(easydram_io)
       }
-      easydram_io
   }
 }
 

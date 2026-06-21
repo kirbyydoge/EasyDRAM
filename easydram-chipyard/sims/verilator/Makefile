@@ -206,11 +206,20 @@ $(model_mk_debug): $(sim_common_files) $(EXTRA_SIM_REQS)
 #########################################################################################
 # invoke make to make verilator sim rules
 #########################################################################################
+HOST_CXX ?= /usr/bin/g++
+HOST_AR ?= /usr/bin/ar
+HOST_PATH ?= /usr/bin:/bin:$(PATH)
+ifneq ($(CONDA_PREFIX),)
+HOST_USER_LDFLAGS ?= -L$(CONDA_PREFIX)/lib -Wl,-rpath,$(CONDA_PREFIX)/lib
+else
+HOST_USER_LDFLAGS ?=
+endif
+
 $(sim): $(model_mk) $(dramsim_lib)
-	$(MAKE) VM_PARALLEL_BUILDS=1 -C $(model_dir) -f V$(TB).mk
+	PATH="$(HOST_PATH)" $(MAKE) VM_PARALLEL_BUILDS=1 CXX=$(HOST_CXX) LINK=$(HOST_CXX) AR=$(HOST_AR) USER_LDFLAGS="$(HOST_USER_LDFLAGS)" -C $(model_dir) -f V$(TB).mk
 
 $(sim_debug): $(model_mk_debug) $(dramsim_lib)
-	$(MAKE) VM_PARALLEL_BUILDS=1 -C $(model_dir_debug) -f V$(TB).mk
+	PATH="$(HOST_PATH)" $(MAKE) VM_PARALLEL_BUILDS=1 CXX=$(HOST_CXX) LINK=$(HOST_CXX) AR=$(HOST_AR) USER_LDFLAGS="$(HOST_USER_LDFLAGS)" -C $(model_dir_debug) -f V$(TB).mk
 
 #########################################################################################
 # create a verilator vpd rule

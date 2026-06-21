@@ -2,7 +2,7 @@
 
 ## Building PolyBench Workloads
 
-After setting up Chipyard, use the RISC-V toolchain from this repository's
+From the repository root, use the RISC-V toolchain from this repository's
 Chipyard environment:
 
 ```bash
@@ -35,7 +35,7 @@ binary on two RTL systems:
 - `EasyDRAMRocketVerifyConfig`: the 1 GHz RTL reference system without time
   scaling.
 
-After setting up Chipyard, build and run both simulators for a single RISC-V
+From the repository root, build and run both simulators for a single RISC-V
 binary with:
 
 ```bash
@@ -62,7 +62,7 @@ verify/workload-EasyDRAMRocketVerifyConfig.out
 ```
 
 For PolyBench-style workloads that print a line containing
-`!#POLYRES#! cycles:<count>`, compare the two runs with:
+`!#POLYRES#! cycle:<count>`, compare the two runs with:
 
 ```bash
 ./calc-timescaling-accuracy.py --program workload

@@ -45,7 +45,7 @@ ifeq ($(SUB_PROJECT),vcu118)
 endif
 
 ifeq ($(SUB_PROJECT),vcu108rocket)
-	SBT_PROJECT       ?= fpga_platforms
+	SBT_PROJECT       ?= chipyard_fpga
 	MODEL             ?= VCU108FPGATestHarness
 	VLOG_MODEL        ?= VCU108FPGATestHarness
 	MODEL_PACKAGE     ?= chipyard.fpga.vcu108
@@ -59,7 +59,7 @@ ifeq ($(SUB_PROJECT),vcu108rocket)
 endif
 
 ifeq ($(SUB_PROJECT),vcu108boom)
-	SBT_PROJECT       ?= fpga_platforms
+	SBT_PROJECT       ?= chipyard_fpga
 	MODEL             ?= VCU108FPGATestHarness
 	VLOG_MODEL        ?= VCU108FPGATestHarness
 	MODEL_PACKAGE     ?= chipyard.fpga.vcu108
@@ -87,7 +87,7 @@ ifeq ($(SUB_PROJECT),vcu108easyrocket)
 endif
 
 ifeq ($(SUB_PROJECT),vcu108easyboom)
-	SBT_PROJECT       ?= fpga_platforms
+	SBT_PROJECT       ?= chipyard_fpga
 	MODEL             ?= VCU108FPGATestHarness
 	VLOG_MODEL        ?= VCU108FPGATestHarness
 	MODEL_PACKAGE     ?= chipyard.fpga.vcu108
